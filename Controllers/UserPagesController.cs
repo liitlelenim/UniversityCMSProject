@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UniversityCMSProject.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace UniversityCMSProject.Controllers
 {
@@ -10,12 +11,12 @@ namespace UniversityCMSProject.Controllers
     {
         public async Task<IActionResult> Index()
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var pages = await context.UserPages
                 .Where(p => p.UserId == userId)
                 .ToListAsync();
-                
+
             return View(pages);
         }
 
@@ -27,29 +28,39 @@ namespace UniversityCMSProject.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(UserPage page)
         {
-            page.UserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var urlExists = await context.UserPages
+                .AnyAsync(p => p.Url == page.Url);
+
+            if (urlExists)
+            {
+                ModelState.AddModelError("Url", "This URL is already taken");
+            }
+
+            page.UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             TryValidateModel(page);
+
             if (ModelState.IsValid)
             {
                 page.CreatedAt = DateTime.UtcNow;
-                
+
                 context.Add(page);
                 await context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(page);
         }
 
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-            
+
             var page = await context.UserPages.FindAsync(id);
             if (page == null) return NotFound();
-            
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (page.UserId != userId) return Forbid();
-            
+
             return View(page);
         }
 
@@ -57,7 +68,8 @@ namespace UniversityCMSProject.Controllers
         public async Task<IActionResult> Edit(int id, UserPage page)
         {
             if (id != page.Id) return NotFound();
-            
+            var urlExists = await context.UserPages
+                .AnyAsync(p => p.Url == page.Url && p.Id != id);
             if (ModelState.IsValid)
             {
                 try
@@ -70,21 +82,23 @@ namespace UniversityCMSProject.Controllers
                     if (!PageExists(page.Id)) return NotFound();
                     throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(page);
         }
 
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
-            
+
             var page = await context.UserPages.FindAsync(id);
             if (page == null) return NotFound();
-            
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (page.UserId != userId) return Forbid();
-            
+
             return View(page);
         }
 
@@ -97,6 +111,7 @@ namespace UniversityCMSProject.Controllers
                 context.UserPages.Remove(page);
                 await context.SaveChangesAsync();
             }
+
             return RedirectToAction(nameof(Index));
         }
 
