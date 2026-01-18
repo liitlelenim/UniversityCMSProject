@@ -67,9 +67,19 @@ namespace UniversityCMSProject.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(int id, UserPage page)
         {
+            
             if (id != page.Id) return NotFound();
             var urlExists = await context.UserPages
                 .AnyAsync(p => p.Url == page.Url && p.Id != id);
+            
+            page.UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            TryValidateModel(page);
+               
+            if (urlExists)
+            {
+                ModelState.AddModelError("Url", "URL already taken");
+            }
+
             if (ModelState.IsValid)
             {
                 try
