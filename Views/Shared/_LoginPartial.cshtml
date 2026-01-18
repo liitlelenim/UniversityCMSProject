@@ -1,0 +1,20 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using UniversityCMSProject.Models
+@inject SignInManager<AppUser> SignInManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="navbar-nav">
+        <span class="nav-link">Hi, @User.Identity?.Name!</span>
+        <form method="post" asp-controller="Account" asp-action="Logout" class="nav-item">
+            <button type="submit" class="nav-link btn btn-link">Logout</button>
+        </form>
+    </div>
+}
+else
+{
+    <div class="navbar-nav">
+        <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+        <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+    </div>
+}
