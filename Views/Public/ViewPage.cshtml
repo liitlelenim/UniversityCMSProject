@@ -1,0 +1,26 @@
+﻿@model UniversityCMSProject.Models.UserPage
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@Model.Title</title>
+    @if (!string.IsNullOrEmpty(Model.CssContent))
+    {
+        <style>@Model.CssContent</style>
+    }
+</head>
+<body>
+@Html.Raw(Model.HtmlContent)
+    
+@if (!string.IsNullOrEmpty(Model.JsContent))
+{
+    <script>
+        @Html.Raw(Model.JsContent)
+        </script>
+}
+</body>
+</html>
