@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using UniversityCMSProject.Models;
 
@@ -21,7 +22,8 @@ namespace UniversityCMSProject.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(string email, string password, string confirmPassword, string nickName)
+        public async Task<IActionResult> Register(string email, string password, string confirmPassword,
+            string nickName)
         {
             if (password != confirmPassword)
             {
@@ -40,6 +42,10 @@ namespace UniversityCMSProject.Controllers
 
             if (result.Succeeded)
             {
+                await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.NameIdentifier, user.Id));
+                await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Name, email));
+                await _userManager.AddClaimAsync(user, new Claim("NickName", nickName));
+
                 await _signInManager.SignInAsync(user, false);
                 return RedirectToAction("Index", "Home");
             }
