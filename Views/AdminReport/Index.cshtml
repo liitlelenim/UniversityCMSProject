@@ -1,0 +1,76 @@
+﻿@model List<Report>
+@{
+    ViewData["Title"] = "Reports Management";
+}
+<div class="container">
+    <h1>Reports Management</h1>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Page</th>
+                <th>Reporter</th>
+                <th>Report</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var report in Model)
+            {
+                <tr class="@(report.IsResolved ? "table-secondary" : "")">
+                    <td>@report.Id</td>
+                    <td>
+                        @if (report.Page != null)
+                        {
+                            <a href="/page/@report.Page.Url" target="_blank">@report.Page.Title</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Page deleted</span>
+                        }
+                    </td>
+                    <td>@report.ReporterNick</td>
+                    <td>@report.Text</td>
+                    <td>@report.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>
+                        @if (report.IsResolved)
+                        {
+                            <span class="badge bg-success">Resolved</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">Pending</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@report.Id" class="btn btn-sm btn-info">Details</a>
+                        @if (!report.IsResolved)
+                        {
+                            <form asp-action="MarkResolved" method="post" style="display:inline">
+                                <input type="hidden" name="id" value="@report.Id" />
+                                <button type="submit" class="btn btn-sm btn-success">Mark Resolved</button>
+                            </form>
+                        }
+                        <form asp-action="Delete" method="post" style="display:inline">
+                            <input type="hidden" name="id" value="@report.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this report?')">Delete</button>
+                        </form>
+                        @if (report.Page != null)
+                        {
+                            <form asp-action="DeletePage" method="post" style="display:inline">
+                                <input type="hidden" name="id" value="@report.Id" />
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete the page and ALL its reports?')">Delete Page</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -7,4 +7,6 @@ namespace UniversityCMSProject;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<AppUser>(options)
 {
     public DbSet<UserPage> UserPages { get; set; }
+    public DbSet<Report> Reports { get; set; }
+
 }

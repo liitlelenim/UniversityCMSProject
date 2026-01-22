@@ -14,8 +14,13 @@
     }
 </head>
 <body>
+<div class="mt-4 border-top pt-3">
+    <a asp-controller="Report" asp-action="Create" asp-route-pageId="@Model.Id" class="btn btn-outline-danger btn-sm">
+        ⚠ Report This Page
+    </a>
+</div>
 @Html.Raw(Model.HtmlContent)
-    
+
 @if (!string.IsNullOrEmpty(Model.JsContent))
 {
     <script>

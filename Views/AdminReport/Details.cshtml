@@ -1,0 +1,60 @@
+﻿@model Report
+@{
+    ViewData["Title"] = "Report Details";
+}
+<div class="container">
+    <h1>Report Details</h1>
+    <dl class="row mt-4">
+        <dt class="col-sm-3">Report ID:</dt>
+        <dd class="col-sm-9">@Model.Id</dd>
+        <dt class="col-sm-3">Reported Page:</dt>
+        <dd class="col-sm-9">
+            @if (Model.Page != null)
+            {
+                <a href="/page/@Model.Page.Url" target="_blank">@Model.Page.Title</a>
+            }
+            else
+            {
+                <span class="text-muted">Page deleted</span>
+            }
+        </dd>
+        <dt class="col-sm-3">Reporter:</dt>
+        <dd class="col-sm-9">@Model.ReporterNick</dd>
+        <dt class="col-sm-3">Report Date:</dt>
+        <dd class="col-sm-9">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+        <dt class="col-sm-3">Status:</dt>
+        <dd class="col-sm-9">
+            @if (Model.IsResolved)
+            {
+                <span class="badge bg-success">Resolved</span>
+            }
+            else
+            {
+                <span class="badge bg-warning">Pending</span>
+            }
+        </dd>
+        <dt class="col-sm-3">Report Text:</dt>
+        <dd class="col-sm-9"><div class="border p-3 bg-light">@Model.Text</div></dd>
+    </dl>
+    <div class="mt-4">
+        @if (!Model.IsResolved)
+        {
+            <form asp-action="MarkResolved" method="post" style="display:inline">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-success">Mark as Resolved</button>
+            </form>
+        }
+        <form asp-action="Delete" method="post" style="display:inline">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this report?')">Delete Report</button>
+        </form>
+        @if (Model.Page != null)
+        {
+            <form asp-action="DeletePage" method="post" style="display:inline">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Delete the page and ALL its reports?')">Delete Page & All Reports</button>
+            </form>
+        }
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
