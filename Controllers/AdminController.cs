@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using UniversityCMSProject.DbContext;
 using UniversityCMSProject.Models;
 
 namespace UniversityCMSProject.Controllers
@@ -65,6 +66,17 @@ namespace UniversityCMSProject.Controllers
             }
             
             return RedirectToAction("AllPages");
+        }
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ManageComments()
+        {
+            var comments = await _context.Comments
+                .Include(c => c.Page)
+                .Include(c => c.Author)
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
+    
+            return View(comments);
         }
     }
 }

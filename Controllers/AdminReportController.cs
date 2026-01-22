@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using UniversityCMSProject.DbContext;
 using UniversityCMSProject.Models;
 
 namespace UniversityCMSProject.Controllers;

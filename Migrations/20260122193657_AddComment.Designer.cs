@@ -12,8 +12,8 @@ using UniversityCMSProject.DbContext;
 namespace UniversityCMSProject.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260118220529_FixedMigration")]
-    partial class FixedMigration
+    [Migration("20260122193657_AddComment")]
+    partial class AddComment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -149,21 +149,6 @@ namespace UniversityCMSProject.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PageTagUserPage", b =>
-                {
-                    b.Property<int>("PagesId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("PagesId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("PageTagUserPage");
-                });
-
             modelBuilder.Entity("UniversityCMSProject.Models.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -232,20 +217,65 @@ namespace UniversityCMSProject.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("UniversityCMSProject.Models.PageTag", b =>
+            modelBuilder.Entity("UniversityCMSProject.Models.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("AuthorId")
                         .IsRequired()
-                        .HasMaxLength(30)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PageId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("PageId");
+
+                    b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("UniversityCMSProject.Models.Report", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsResolved")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReporterNick")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("PageTags");
+                    b.HasIndex("PageId");
+
+                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("UniversityCMSProject.Models.UserPage", b =>
@@ -342,19 +372,34 @@ namespace UniversityCMSProject.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PageTagUserPage", b =>
+            modelBuilder.Entity("UniversityCMSProject.Models.Comment", b =>
                 {
-                    b.HasOne("UniversityCMSProject.Models.UserPage", null)
+                    b.HasOne("UniversityCMSProject.Models.AppUser", "Author")
                         .WithMany()
-                        .HasForeignKey("PagesId")
+                        .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("UniversityCMSProject.Models.PageTag", null)
+                    b.HasOne("UniversityCMSProject.Models.UserPage", "Page")
                         .WithMany()
-                        .HasForeignKey("TagsId")
+                        .HasForeignKey("PageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Page");
+                });
+
+            modelBuilder.Entity("UniversityCMSProject.Models.Report", b =>
+                {
+                    b.HasOne("UniversityCMSProject.Models.UserPage", "Page")
+                        .WithMany()
+                        .HasForeignKey("PageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Page");
                 });
 
             modelBuilder.Entity("UniversityCMSProject.Models.UserPage", b =>

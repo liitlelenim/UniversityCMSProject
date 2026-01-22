@@ -1,7 +1,7 @@
 ﻿@model UniversityCMSProject.Models.UserPage
 
 @{
-    Layout = null;
+    Layout = "_Layout";
 }
 
 <!DOCTYPE html>
@@ -16,7 +16,7 @@
 <body>
 <div class="mt-4 border-top pt-3">
     <a asp-controller="Report" asp-action="Create" asp-route-pageId="@Model.Id" class="btn btn-outline-danger btn-sm">
-        ⚠ Report This Page
+        Report This Page
     </a>
 </div>
 @Html.Raw(Model.HtmlContent)
@@ -26,6 +26,12 @@
     <script>
         @Html.Raw(Model.JsContent)
         </script>
+}
+@{
+    if (ViewBag.Comments is List<Comment> comments)
+    {
+        @await Html.PartialAsync("~/Views/Comment/_CommentsPartial.cshtml", comments)
+    }
 }
 </body>
 </html>

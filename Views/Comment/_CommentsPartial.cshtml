@@ -1,0 +1,62 @@
+﻿@model List<Comment>
+@{
+    var pageId = ViewBag.PageId as int?;
+}
+
+<div class="mt-4">
+    <h5>Comments (@Model.Count)</h5>
+
+    @if (User.Identity.IsAuthenticated && pageId.HasValue)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <form asp-controller="Comment" asp-action="Create" method="post">
+                    <input type="hidden" name="pageId" value="@pageId" />
+                    <div class="mb-2">
+                        <textarea name="content" class="form-control" rows="3"
+                                  placeholder="Write a comment..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Post Comment</button>
+                </form>
+            </div>
+        </div>
+    }
+    else if (!User.Identity.IsAuthenticated)
+    {
+        <div class="alert alert-warning mb-3">
+            <a asp-controller="Account" asp-action="Login">Log in</a> to comment
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        @foreach (var comment in Model)
+        {
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>@comment.Author?.NickName</strong>
+                            <small class="text-muted ms-2">@comment.CreatedAt.ToString("dd.MM.yyyy HH:mm")</small>
+                        </div>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <form asp-controller="Comment" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@comment.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Delete comment?')">
+                                    Delete
+                                </button>
+                            </form>
+                        }
+                    </div>
+                    <p class="mt-2 mb-0">@comment.Content</p>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-muted">No comments yet.</p>
+    }
+</div>
