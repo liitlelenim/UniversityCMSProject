@@ -30,5 +30,4 @@ public class UserPage
     
     public AppUser? User { get; set; }
 
-    public List<PageTag> Tags { get; set; } = new List<PageTag>();
 }
