@@ -59,7 +59,10 @@ namespace UniversityCMSProject.Controllers
             if (page == null) return NotFound();
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (page.UserId != userId) return Forbid();
+            var isAdmin = User.IsInRole("Admin");
+
+            if (page.UserId != userId && !isAdmin)
+                return Forbid();
 
             return View(page);
         }
@@ -67,14 +70,20 @@ namespace UniversityCMSProject.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(int id, UserPage page)
         {
-            
             if (id != page.Id) return NotFound();
+
             var urlExists = await context.UserPages
                 .AnyAsync(p => p.Url == page.Url && p.Id != id);
-            
-            page.UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            TryValidateModel(page);
-               
+
+            var originalPage = await context.UserPages.FindAsync(id);
+            if (originalPage == null) return NotFound();
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var isAdmin = User.IsInRole("Admin");
+
+            if (originalPage.UserId != userId && !isAdmin)
+                return Forbid();
+
             if (urlExists)
             {
                 ModelState.AddModelError("Url", "URL already taken");
@@ -82,9 +91,15 @@ namespace UniversityCMSProject.Controllers
 
             if (ModelState.IsValid)
             {
+                originalPage.Title = page.Title;
+                originalPage.Url = page.Url;
+                originalPage.HtmlContent = page.HtmlContent;
+                originalPage.CssContent = page.CssContent;
+                originalPage.JsContent = page.JsContent;
+                originalPage.IsPublic = page.IsPublic;
+
                 try
                 {
-                    context.Update(page);
                     await context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -107,7 +122,10 @@ namespace UniversityCMSProject.Controllers
             if (page == null) return NotFound();
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (page.UserId != userId) return Forbid();
+            var isAdmin = User.IsInRole("Admin");
+
+            if (page.UserId != userId && !isAdmin)
+                return Forbid();
 
             return View(page);
         }
@@ -116,6 +134,14 @@ namespace UniversityCMSProject.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var page = await context.UserPages.FindAsync(id);
+            if (page == null) return NotFound();
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var isAdmin = User.IsInRole("Admin");
+
+            if (page.UserId != userId && !isAdmin)
+                return Forbid();
+
             if (page != null)
             {
                 context.UserPages.Remove(page);

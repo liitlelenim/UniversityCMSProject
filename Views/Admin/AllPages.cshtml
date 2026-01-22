@@ -1,0 +1,52 @@
+﻿@model List<UserPage>
+@{
+    ViewData["Title"] = "All Pages";
+}
+
+<div class="container">
+    <h1>All User Pages</h1>
+
+    <table class="table table-striped mt-4">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>URL</th>
+            <th>Author</th>
+            <th>Public</th>
+            <th>Created</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var pageItem in Model)
+        {
+            <tr>
+                <td>@pageItem.Id</td>
+                <td>@pageItem.Title</td>
+                <td>@pageItem.Url</td>
+                <td>
+                    @if (pageItem.User != null)
+                    {
+                        @pageItem.User.NickName
+                    }
+                    else
+                    {
+                        <span class="text-muted">Unknown</span>
+                    }
+                </td>
+                <td>@(pageItem.IsPublic ? "Yes" : "No")</td>
+                <td>@pageItem.CreatedAt.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <a asp-action="EditPage" asp-route-id="@pageItem.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <form asp-action="DeletePage" method="post" style="display:inline">
+                        <input type="hidden" name="id" value="@pageItem.Id" />
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
