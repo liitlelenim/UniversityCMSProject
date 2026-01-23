@@ -52,3 +52,7 @@ Administrator ma możliwość przeglądania wszystkich stron i komentarzy. Ma mo
 
 Dostajemy również dostęp do zgłoszeń, oraz proste narzędzia do ich rozwiązywania
 ![](DocumentationImages/image-6.png)
+
+# Encje i ich relacje
+
+![img.png](img.png)
